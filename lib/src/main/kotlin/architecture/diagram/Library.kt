@@ -3,8 +3,8 @@
  */
 package architecture.diagram
 
+import com.structurizr.export.IndentingWriter
+
 class Library {
-    fun someLibraryMethod(): Boolean {
-        return true
-    }
+    private val identWriter: IndentingWriter = IndentingWriter()
 }
