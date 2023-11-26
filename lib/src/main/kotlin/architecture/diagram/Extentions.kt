@@ -16,7 +16,6 @@ fun String.toCamelCase(): String {
 
 fun Person.toDslString(identWriter: IndentingWriter): IndentingWriter {
     identWriter.writeLine("${this.name.toCamelCase()} = person \"${this.name}\"")
-    this.relationships.map { it.toDsl(identWriter)}
     return identWriter
 }
 
@@ -25,7 +24,10 @@ fun SoftwareSystem.toDslString(identWriter: IndentingWriter): IndentingWriter {
     return identWriter
 }
 
-fun Relationship.toDsl(identWriter: IndentingWriter) {
-    identWriter.writeLine("${this.source.name.toCamelCase()} -> ${this.destination.name.toCamelCase()} \"${this.description}\"")
+fun Relationship.toDslString(identWriter: IndentingWriter): IndentingWriter {
+    identWriter.writeLine(
+        "${this.source.name.toCamelCase()} -> ${this.destination.name.toCamelCase()} \"${this.description}\""
+    )
+    return identWriter
 }
 

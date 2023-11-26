@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 class LibraryTest {
 
-
     @Test fun `test name to camelcase`() {
         assertEquals("mySoftwareSystem", "My Software System".toCamelCase())
     }
@@ -32,6 +31,16 @@ class LibraryTest {
         assertEquals(
             "softwareSystem = softwareSystem \"Software System\"",
             softwareSystem.toDslString(IndentingWriter()).toString()
+        )
+    }
+    @Test fun `relationship user used software system`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val person = workspace.model.addPerson("User")
+        person.uses(softwareSystem, "uses")
+        assertEquals(
+            "user -> softwareSystem \"uses\"",
+            workspace.model.relationships.first().toDslString(IndentingWriter()).toString()
         )
     }
 
