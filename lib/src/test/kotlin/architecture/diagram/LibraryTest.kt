@@ -44,4 +44,73 @@ class LibraryTest {
         )
     }
 
+    @Test fun `Container to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container", "Description", "Technology")
+        assertEquals(
+            "container = container \"Container\"",
+            container.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Component to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container", "Description", "Technology")
+        val component = container.addComponent("Component", "Description", "Technology")
+        assertEquals(
+            "component = component \"Component\"",
+            component.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Model to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container", "Description", "Technology")
+        container.addComponent("Component", "Description", "Technology")
+        val person = workspace.model.addPerson("User")
+        person.uses(softwareSystem, "uses")
+        assertEquals(
+            """
+                model {
+                  user = person "User"
+                  softwareSystem = softwareSystem "Software System" {
+                    container = container "Container" {
+                      component = component "Component"
+                    }
+                  }
+                  user -> softwareSystem "uses"
+                }
+            """.trimIndent(),
+            workspace.model.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Workspace to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container", "Description", "Technology")
+        container.addComponent("Component", "Description", "Technology")
+        val person = workspace.model.addPerson("User")
+        person.uses(softwareSystem, "uses")
+        assertEquals(
+            """
+                workspace "Workspace" "description"{
+                  model {
+                    user = person "User"
+                    softwareSystem = softwareSystem "Software System" {
+                      container = container "Container" {
+                        component = component "Component"
+                      }
+                    }
+                    user -> softwareSystem "uses"
+                  }
+                }
+            """.trimIndent(),
+            workspace.toDslString(IndentingWriter()).toString()
+        )
+    }
+
 }
