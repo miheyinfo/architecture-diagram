@@ -11,11 +11,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class LibraryTest {
-
     @Test fun `test name to camelcase`() {
         assertEquals("mySoftwareSystem", "My Software System".toCamelCase())
     }
-
 
     @Test fun `Person to dsl string creates valid dsl`() {
         val workspace = Workspace("Workspace", "description")
@@ -59,7 +57,12 @@ class LibraryTest {
         val workspace = Workspace("Workspace", "description")
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
         assertEquals(
-            "softwareSystem = softwareSystem \"Software System\"",
+            """
+                softwareSystem = softwareSystem "Software System" {
+                  description ""
+                  tags "Element", "Software System"
+                }
+            """.trimIndent(),
             softwareSystem.toDslString(IndentingWriter()).toString()
         )
     }
@@ -151,6 +154,8 @@ class LibraryTest {
                     tags "Element", "Person"
                   }
                   softwareSystem = softwareSystem "Software System" {
+                    description ""
+                    tags "Element", "Software System"
                     container = container "Container" {
                       component = component "Component" {
                         description "Description"
@@ -184,6 +189,8 @@ class LibraryTest {
                       tags "Element", "Person"
                     }
                     softwareSystem = softwareSystem "Software System" {
+                      description ""
+                      tags "Element", "Software System"
                       container = container "Container" {
                         component = component "Component" {
                           description "Description"

@@ -36,13 +36,21 @@ fun Person.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
 }
 
 fun SoftwareSystem.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    val firstLine = "${this.name.toCamelCase()} = softwareSystem \"${this.name}\""
-    if (this.containers.isEmpty()) {
-        indentingWriter.writeLine(firstLine)
-        return indentingWriter
-    }
-    indentingWriter.writeLine("$firstLine {")
+    indentingWriter.writeLine("${this.name.toCamelCase()} = softwareSystem \"${this.name}\" {")
     indentingWriter.indent()
+    indentingWriter.writeLine("description \"${this.description}\"")
+    if (!this.url.isNullOrEmpty())
+        indentingWriter.writeLine("url \"${this.url}\"")
+    indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
     this.containers.forEach {
         it.toDslString(indentingWriter)
     }
@@ -121,6 +129,15 @@ fun Workspace.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     indentingWriter.writeLine("workspace \"${this.name}\" \"${this.description}\" {")
     indentingWriter.indent()
     this.model.toDslString(indentingWriter)
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
