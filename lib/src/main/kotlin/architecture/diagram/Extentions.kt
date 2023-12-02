@@ -68,19 +68,44 @@ fun Container.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
 }
 
 fun Component.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine(
-        "${this.name.toCamelCase()} = component \"${this.name}\""
-    )
+    indentingWriter.writeLine("${this.name.toCamelCase()} = component \"${this.name}\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("description \"${this.description}\"")
+    indentingWriter.writeLine("technology \"${this.technology}\"")
+    indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
     return indentingWriter
 }
 
 fun Relationship.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine(
-        "${this.source.name.toCamelCase()} -> ${this.destination.name.toCamelCase()} \"${this.description}\""
-    )
+    val technology = if (!this.technology.isNullOrEmpty()) { " \"${this.technology}\"" } else ""
+    val description = if (!this.description.isNullOrEmpty()) { " \"${this.description}\"" } else ""
+    indentingWriter.writeLine("${this.source.name.toCamelCase()} -> ${this.destination.name.toCamelCase()}$description$technology {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
     return indentingWriter
 }
-
 fun Model.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     indentingWriter.writeLine("model {")
     indentingWriter.indent()

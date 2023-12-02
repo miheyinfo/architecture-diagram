@@ -5,6 +5,7 @@ package architecture.diagram
 
 import com.structurizr.Workspace
 import com.structurizr.export.IndentingWriter
+import com.structurizr.model.InteractionStyle
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,10 +22,10 @@ class LibraryTest {
         val person = workspace.model.addPerson("User")
         assertEquals(
             """
-                    user = person "User" {
-                      description ""
-                      tags "Element", "Person"
-                    }
+                user = person "User" {
+                  description ""
+                  tags "Element", "Person"
+                }
             """.trimIndent(),
             person.toDslString(IndentingWriter()).toString()
         )
@@ -68,8 +69,36 @@ class LibraryTest {
         val person = workspace.model.addPerson("User")
         person.uses(softwareSystem, "uses")
         assertEquals(
-            "user -> softwareSystem \"uses\"",
+            """
+                user -> softwareSystem "uses" {
+                  tags "Relationship"
+                }
+            """.trimIndent(),
             workspace.model.relationships.first().toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Relationship to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container1 = softwareSystem.addContainer("Container1", "Description", "Technology")
+        val container2 = softwareSystem.addContainer("Container2", "Description", "Technology")
+        val component1 = container1.addComponent("Component1", "Description", "Technology")
+        val component2 = container2.addComponent("Component2", "Description", "Technology")
+        val relationship = component1.uses(component2, "Uses", "HTTP", InteractionStyle.Synchronous, arrayOf("Tag1", "Tag2", "Tag3"))
+        relationship?.addProperty("property1", "value1")
+        relationship?.addProperty("property2", "value2")
+        assertEquals(
+            """
+        component1 -> component2 "Uses" "HTTP" {
+          tags "Relationship", "Synchronous", "Tag1", "Tag2", "Tag3"
+          properties {
+            property1 "value1"
+            property2 "value2"
+          }
+        }
+        """.trimIndent(),
+            relationship?.toDslString(IndentingWriter()).toString()
         )
     }
 
@@ -88,8 +117,21 @@ class LibraryTest {
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
         val container = softwareSystem.addContainer("Container", "Description", "Technology")
         val component = container.addComponent("Component", "Description", "Technology")
+        component.addTags("Tag1", "Tag2", "Tag3")
+        component.addProperty("property1", "value1")
+        component.addProperty("property2", "value2")
         assertEquals(
-            "component = component \"Component\"",
+            """
+        component = component "Component" {
+          description "Description"
+          technology "Technology"
+          tags "Element", "Component", "Tag1", "Tag2", "Tag3"
+          properties {
+            property1 "value1"
+            property2 "value2"
+          }
+        }
+        """.trimIndent(),
             component.toDslString(IndentingWriter()).toString()
         )
     }
@@ -110,10 +152,16 @@ class LibraryTest {
                   }
                   softwareSystem = softwareSystem "Software System" {
                     container = container "Container" {
-                      component = component "Component"
+                      component = component "Component" {
+                        description "Description"
+                        technology "Technology"
+                        tags "Element", "Component"
+                      }
                     }
                   }
-                  user -> softwareSystem "uses"
+                  user -> softwareSystem "uses" {
+                    tags "Relationship"
+                  }
                 }
             """.trimIndent(),
             workspace.model.toDslString(IndentingWriter()).toString()
@@ -137,10 +185,16 @@ class LibraryTest {
                     }
                     softwareSystem = softwareSystem "Software System" {
                       container = container "Container" {
-                        component = component "Component"
+                        component = component "Component" {
+                          description "Description"
+                          technology "Technology"
+                          tags "Element", "Component"
+                        }
                       }
                     }
-                    user -> softwareSystem "uses"
+                    user -> softwareSystem "uses" {
+                      tags "Relationship"
+                    }
                   }
                 }
             """.trimIndent(),
