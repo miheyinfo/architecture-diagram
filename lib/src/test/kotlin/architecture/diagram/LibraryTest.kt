@@ -20,7 +20,36 @@ class LibraryTest {
         val workspace = Workspace("Workspace", "description")
         val person = workspace.model.addPerson("User")
         assertEquals(
-            "user = person \"User\"",
+            """
+                    user = person "User" {
+                      description ""
+                      tags "Element", "Person"
+                    }
+            """.trimIndent(),
+            person.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Person with attributes to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val person = workspace.model.addPerson("User")
+        person.addTags("Tag1", "Tag2", "Tag3")
+        person.addProperty("property1", "value1")
+        person.addProperty("property2", "value2")
+        person.url = "http://example.com"
+        person.description = "This is a user"
+        assertEquals(
+            """
+        user = person "User" {
+          description "This is a user"
+          url "http://example.com"
+          tags "Element", "Person", "Tag1", "Tag2", "Tag3"
+          properties {
+            property1 "value1"
+            property2 "value2"
+          }
+        }
+        """.trimIndent(),
             person.toDslString(IndentingWriter()).toString()
         )
     }
@@ -75,7 +104,10 @@ class LibraryTest {
         assertEquals(
             """
                 model {
-                  user = person "User"
+                  user = person "User" {
+                    description ""
+                    tags "Element", "Person"
+                  }
                   softwareSystem = softwareSystem "Software System" {
                     container = container "Container" {
                       component = component "Component"
@@ -97,9 +129,12 @@ class LibraryTest {
         person.uses(softwareSystem, "uses")
         assertEquals(
             """
-                workspace "Workspace" "description"{
+                workspace "Workspace" "description" {
                   model {
-                    user = person "User"
+                    user = person "User" {
+                      description ""
+                      tags "Element", "Person"
+                    }
                     softwareSystem = softwareSystem "Software System" {
                       container = container "Container" {
                         component = component "Component"

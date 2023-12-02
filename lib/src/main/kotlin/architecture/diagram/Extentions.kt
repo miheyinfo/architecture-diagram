@@ -14,7 +14,24 @@ fun String.toCamelCase(): String {
 }
 
 fun Person.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine("${this.name.toCamelCase()} = person \"${this.name}\"")
+    indentingWriter.writeLine("${this.name.toCamelCase()} = person \"${this.name}\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("description \"${this.description}\"")
+    if (!this.url.isNullOrEmpty())
+        indentingWriter.writeLine("url \"${this.url}\"")
+    indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    this.getTagsAsSet()
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
     return indentingWriter
 }
 
@@ -76,7 +93,7 @@ fun Model.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
 }
 
 fun Workspace.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine("workspace \"${this.name}\" \"${this.description}\"{")
+    indentingWriter.writeLine("workspace \"${this.name}\" \"${this.description}\" {")
     indentingWriter.indent()
     this.model.toDslString(indentingWriter)
     indentingWriter.outdent()
