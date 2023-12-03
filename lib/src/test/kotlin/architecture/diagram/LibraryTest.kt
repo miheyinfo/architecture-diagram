@@ -6,6 +6,7 @@ package architecture.diagram
 import com.structurizr.Workspace
 import com.structurizr.export.IndentingWriter
 import com.structurizr.model.InteractionStyle
+import com.structurizr.util.WorkspaceUtils
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -105,12 +106,31 @@ class LibraryTest {
         )
     }
 
-    @Test fun `Container to dsl string creates valid dsl`() {
+    @Test fun `Container to dsl string container without components`() {
         val workspace = Workspace("Workspace", "description")
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
         val container = softwareSystem.addContainer("Container", "Description", "Technology")
         assertEquals(
             "container = container \"Container\"",
+            container.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Container to dsl string container with component`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container", "Description", "Technology")
+        container.addComponent("Component", "Description", "Technology")
+        assertEquals(
+            """
+                container = container "Container" {
+                  component = component "Component" {
+                    description "Description"
+                    technology "Technology"
+                    tags "Element", "Component"
+                  }
+                }
+            """.trimIndent(),
             container.toDslString(IndentingWriter()).toString()
         )
     }
@@ -173,13 +193,83 @@ class LibraryTest {
         )
     }
 
-    @Test fun `Workspace to dsl string creates valid dsl`() {
+    @Test fun `SystemContext view to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val viewSet = workspace.views
+        val contextView = viewSet.createSystemContextView(
+            softwareSystem, "context", "Cluster Diagram"
+        )
+        contextView.addAllSoftwareSystems()
+        contextView.addAllPeople()
+        contextView.enableAutomaticLayout()
+        assertEquals(
+            """
+                systemContext softwareSystem {
+                  description "Cluster Diagram"
+                }
+            """.trimIndent(),
+            contextView.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `SystemContext view with animation to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val viewSet = workspace.views
+        val contextView = viewSet.createSystemContextView(
+            softwareSystem, "context", "Cluster Diagram"
+        )
+        contextView.addAllSoftwareSystems()
+        contextView.addAllPeople()
+        contextView.enableAutomaticLayout()
+        contextView.addAnimation(softwareSystem)
+        assertEquals(
+            """
+                systemContext softwareSystem {
+                  description "Cluster Diagram"
+                }
+            """.trimIndent(),
+            contextView.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `ComponentView view to dsl string creates valid dsl`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        val container = softwareSystem.addContainer("Container1", "Description", "Technology")
+        val component = container.addComponent("Component", "Description", "Technology")
+        val viewSet = workspace.views
+        val componentView = viewSet.createComponentView(
+            container, "context", "Cluster Diagram"
+        )
+        componentView.addAllComponents()
+        componentView.enableAutomaticLayout()
+        componentView.addAnimation(component)
+        assertEquals(
+            """
+                component container1 "context" {
+                  description "Cluster Diagram"
+                }
+            """.trimIndent(),
+            componentView.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `test workspace with SystemContextView view`() {
         val workspace = Workspace("Workspace", "description")
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
         val container = softwareSystem.addContainer("Container", "Description", "Technology")
         container.addComponent("Component", "Description", "Technology")
         val person = workspace.model.addPerson("User")
         person.uses(softwareSystem, "uses")
+        val viewSet = workspace.views
+        val contextView = viewSet.createSystemContextView(
+            softwareSystem, "context", "Cluster Diagram"
+        )
+        contextView.addAllSoftwareSystems()
+        contextView.addAllPeople()
+        contextView.enableAutomaticLayout()
         assertEquals(
             """
                 workspace "Workspace" "description" {
@@ -203,10 +293,129 @@ class LibraryTest {
                       tags "Relationship"
                     }
                   }
+                  views {
+                    systemContext softwareSystem {
+                      description "Cluster Diagram"
+                    }
+                  }
                 }
-            """.trimIndent(),
-            workspace.toDslString(IndentingWriter()).toString()
-        )
+            """.trimIndent(), workspace.toDslString(IndentingWriter()).toString())
+    }
+
+
+    private fun testWorkspace(): Workspace {
+        return WorkspaceUtils.fromJson("""
+            {
+                "name": "Getting Started",
+                "description": "This is a model of my software system.",
+                "lastModifiedDate": "2020-03-08T07:24:37Z",
+                "model": {
+                    "people": [
+                        {
+                            "id": "1",
+                            "tags": "Element,Person",
+                            "name": "User",
+                            "description": "A user of my software system.",
+                            "relationships": [
+                                {
+                                    "id": "3",
+                                    "tags": "Relationship,Synchronous",
+                                    "sourceId": "1",
+                                    "destinationId": "2",
+                                    "description": "Uses",
+                                    "interactionStyle": "Synchronous"
+                                }
+                            ],
+                            "location": "Unspecified"
+                        }
+                    ],
+                    "softwareSystems": [
+                        {
+                            "id": "2",
+                            "tags": "Element,Software System",
+                            "name": "Software System",
+                            "description": "My software system.",
+                            "location": "Unspecified"
+                        }
+                    ],
+                    "deploymentNodes": []
+                },
+                "documentation": {
+                    "sections": [],
+                    "decisions": [],
+                    "images": []
+                },
+                "views": {
+                    "systemContextViews": [
+                        {
+                            "softwareSystemId": "2",
+                            "description": "An example of a System Context diagram.",
+                            "key": "SystemContext",
+                            "paperSize": "A5_Landscape",
+                            "animations": [
+                                {
+                                    "order": 1,
+                                    "elements": [
+                                        "1",
+                                        "2"
+                                    ],
+                                    "relationships": [
+                                        "3"
+                                    ]
+                                }
+                            ],
+                            "enterpriseBoundaryVisible": true,
+                            "elements": [
+                                {
+                                    "id": "1",
+                                    "x": 660,
+                                    "y": 614
+                                },
+                                {
+                                    "id": "2",
+                                    "x": 1370,
+                                    "y": 664
+                                }
+                            ],
+                            "relationships": [
+                                {
+                                    "id": "3"
+                                }
+                            ]
+                        }
+                    ],
+                    "configuration": {
+                        "branding": {},
+                        "styles": {
+                            "elements": [
+                                {
+                                    "tag": "Software System",
+                                    "background": "#1168bd",
+                                    "color": "#ffffff"
+                                },
+                                {
+                                    "tag": "Person",
+                                    "background": "#08427b",
+                                    "color": "#ffffff",
+                                    "shape": "Person"
+                                }
+                            ],
+                            "relationships": []
+                        },
+                        "terminology": {},
+                        "lastSavedView": "SystemContext",
+                        "viewSortOrder": "Default",
+                        "themes": []
+                    },
+                    "systemLandscapeViews": [],
+                    "containerViews": [],
+                    "componentViews": [],
+                    "dynamicViews": [],
+                    "deploymentViews": [],
+                    "filteredViews": []
+                }
+            }
+        """.trimIndent())
     }
 
 }
