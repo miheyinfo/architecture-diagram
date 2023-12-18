@@ -207,6 +207,7 @@ class LibraryTest {
             """
                 systemContext softwareSystem {
                   description "Cluster Diagram"
+                  include *
                 }
             """.trimIndent(),
             contextView.toDslString(IndentingWriter()).toString()
@@ -228,6 +229,7 @@ class LibraryTest {
             """
                 systemContext softwareSystem {
                   description "Cluster Diagram"
+                  include *
                 }
             """.trimIndent(),
             contextView.toDslString(IndentingWriter()).toString()
@@ -250,6 +252,7 @@ class LibraryTest {
             """
                 component container1 "context" {
                   description "Cluster Diagram"
+                  include *
                 }
             """.trimIndent(),
             componentView.toDslString(IndentingWriter()).toString()
@@ -296,6 +299,7 @@ class LibraryTest {
                   views {
                     systemContext softwareSystem {
                       description "Cluster Diagram"
+                      include *
                     }
                   }
                 }

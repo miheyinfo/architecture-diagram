@@ -272,6 +272,7 @@ fun SystemContextView.toDslString(indentingWriter: IndentingWriter): IndentingWr
     indentingWriter.writeLine("systemContext ${this.softwareSystem.name.toCamelCase()} {")
     indentingWriter.indent()
     indentingWriter.writeLine("description \"${this.description}\"")
+    indentingWriter.writeLine("include *")
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
