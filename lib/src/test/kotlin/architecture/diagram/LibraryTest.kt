@@ -111,7 +111,13 @@ class LibraryTest {
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
         val container = softwareSystem.addContainer("Container", "Description", "Technology")
         assertEquals(
-            "container = container \"Container\"",
+            """
+                container = container "Container" {
+                  tags "Element", "Container"
+                  description "Description"
+                  technology "Technology"
+                }
+            """.trimIndent(),
             container.toDslString(IndentingWriter()).toString()
         )
     }
@@ -124,14 +130,37 @@ class LibraryTest {
         assertEquals(
             """
                 container = container "Container" {
+                  tags "Element", "Container"
+                  description "Description"
+                  technology "Technology"
                   component = component "Component" {
+                    tags "Element", "Component"
                     description "Description"
                     technology "Technology"
-                    tags "Element", "Component"
                   }
                 }
             """.trimIndent(),
             container.toDslString(IndentingWriter()).toString()
+        )
+    }
+
+    @Test fun `Software System to dsl string with container`() {
+        val workspace = Workspace("Workspace", "description")
+        val softwareSystem = workspace.model.addSoftwareSystem("Software System")
+        softwareSystem.addContainer("Container", "Description", "Technology")
+        assertEquals(
+            """
+                softwareSystem = softwareSystem "Software System" {
+                  description ""
+                  tags "Element", "Software System"
+                  container = container "Container" {
+                    tags "Element", "Container"
+                    description "Description"
+                    technology "Technology"
+                  }
+                }
+            """.trimIndent(),
+            softwareSystem.toDslString(IndentingWriter()).toString()
         )
     }
 
@@ -146,9 +175,9 @@ class LibraryTest {
         assertEquals(
             """
         component = component "Component" {
+          tags "Element", "Component", "Tag1", "Tag2", "Tag3"
           description "Description"
           technology "Technology"
-          tags "Element", "Component", "Tag1", "Tag2", "Tag3"
           properties {
             property1 "value1"
             property2 "value2"
@@ -162,8 +191,8 @@ class LibraryTest {
     @Test fun `Model to dsl string creates valid dsl`() {
         val workspace = Workspace("Workspace", "description")
         val softwareSystem = workspace.model.addSoftwareSystem("Software System")
-        val container = softwareSystem.addContainer("Container", "Description", "Technology")
-        container.addComponent("Component", "Description", "Technology")
+        val container = softwareSystem.addContainer("Container")
+        container.addComponent("Component")
         val person = workspace.model.addPerson("User")
         person.uses(softwareSystem, "uses")
         assertEquals(
@@ -177,9 +206,8 @@ class LibraryTest {
                     description ""
                     tags "Element", "Software System"
                     container = container "Container" {
+                      tags "Element", "Container"
                       component = component "Component" {
-                        description "Description"
-                        technology "Technology"
                         tags "Element", "Component"
                       }
                     }
@@ -285,10 +313,13 @@ class LibraryTest {
                       description ""
                       tags "Element", "Software System"
                       container = container "Container" {
+                        tags "Element", "Container"
+                        description "Description"
+                        technology "Technology"
                         component = component "Component" {
+                          tags "Element", "Component"
                           description "Description"
                           technology "Technology"
-                          tags "Element", "Component"
                         }
                       }
                     }

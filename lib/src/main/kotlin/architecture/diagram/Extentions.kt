@@ -61,13 +61,18 @@ fun SoftwareSystem.toDslString(indentingWriter: IndentingWriter): IndentingWrite
 }
 
 fun Container.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    val firstLine = "${this.name.toCamelCase()} = container \"${this.name}\""
-    if (this.components.isEmpty()) {
-        indentingWriter.writeLine(firstLine)
-        return indentingWriter
-    }
-    indentingWriter.writeLine("$firstLine {")
+    indentingWriter.writeLine("${this.name.toCamelCase()} = container \"${this.name}\" {")
     indentingWriter.indent()
+    indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    if (!this.description.isNullOrEmpty()) {
+        indentingWriter.writeLine("description \"${this.description}\"")
+    }
+    if (!this.url.isNullOrEmpty()){
+        indentingWriter.writeLine("url \"${this.url}\"")
+    }
+    if (!this.technology.isNullOrEmpty()) {
+        indentingWriter.writeLine("technology \"${this.technology}\"")
+    }
     this.components.forEach {
         it.toDslString(indentingWriter)
     }
@@ -79,9 +84,16 @@ fun Container.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
 fun Component.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     indentingWriter.writeLine("${this.name.toCamelCase()} = component \"${this.name}\" {")
     indentingWriter.indent()
-    indentingWriter.writeLine("description \"${this.description}\"")
-    indentingWriter.writeLine("technology \"${this.technology}\"")
     indentingWriter.writeLine("tags ${this.getTagsAsSet().joinToString(", ") { "\"$it\"" }}")
+    if (!this.description.isNullOrEmpty()) {
+        indentingWriter.writeLine("description \"${this.description}\"")
+    }
+    if (!this.url.isNullOrEmpty()){
+        indentingWriter.writeLine("url \"${this.url}\"")
+    }
+    if (!this.technology.isNullOrEmpty()) {
+        indentingWriter.writeLine("technology \"${this.technology}\"")
+    }
     if (this.properties.isNotEmpty()) {
         indentingWriter.writeLine("properties {")
         indentingWriter.indent()
