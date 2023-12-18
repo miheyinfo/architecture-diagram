@@ -168,6 +168,7 @@ fun ComponentView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
 
     // TODO Add other attributes here
 
+    indentingWriter.writeLine("include *")
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
@@ -177,11 +178,12 @@ fun ContainerView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
     indentingWriter.writeLine("container \"${this.softwareSystem.name}\" {")
     indentingWriter.indent()
     indentingWriter.writeLine("description \"${this.description}\"")
-    this.elements.forEach { it.toDslString(indentingWriter) }
-    this.relationships.forEach { it.toDslString(indentingWriter) }
+//    this.elements.forEach { it.toDslString(indentingWriter) }
+//    this.relationships.forEach { it.toDslString(indentingWriter) }
 
     // TODO Add other attributes here
 
+    indentingWriter.writeLine("include *")
     this.automaticLayout?.toDslString(indentingWriter)
     this.animations.forEach { _ -> toDslString(indentingWriter) }
     indentingWriter.writeLine("title \"${this.title}\"")
@@ -201,14 +203,16 @@ fun ContainerView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
 }
 
 fun AutomaticLayout.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine("autoLayout {")
-    indentingWriter.indent()
-    indentingWriter.writeLine("rankDirection \"${this.rankDirection}\"")
-    indentingWriter.writeLine("rankSeparation ${this.rankSeparation}")
-    indentingWriter.writeLine("nodeSeparation ${this.nodeSeparation}")
-    indentingWriter.writeLine("edgeSeparation ${this.edgeSeparation}")
-    indentingWriter.outdent()
-    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("autoLayout")
+    // TODO wrong attribute names
+//    indentingWriter.writeLine("autoLayout {")
+//    indentingWriter.indent()
+//    indentingWriter.writeLine("rankDirection \"${this.rankDirection}\"")
+//    indentingWriter.writeLine("rankSeparation ${this.rankSeparation}")
+//    indentingWriter.writeLine("nodeSeparation ${this.nodeSeparation}")
+//    indentingWriter.writeLine("edgeSeparation ${this.edgeSeparation}")
+//    indentingWriter.outdent()
+//    indentingWriter.writeLine("}")
     return indentingWriter
 }
 
