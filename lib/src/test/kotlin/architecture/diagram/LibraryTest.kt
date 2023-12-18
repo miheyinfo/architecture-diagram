@@ -301,6 +301,26 @@ class LibraryTest {
                       description "Cluster Diagram"
                       include *
                     }
+                    styles {
+                      element "Person" {
+                        shape person
+                      }
+                      element "Database" {
+                        shape cylinder
+                      }
+                      element "MobileApp" {
+                        shape mobileDevicePortrait
+                      }
+                      element "Browser" {
+                        shape webBrowser
+                      }
+                      element "Pipe" {
+                        shape pipe
+                      }
+                      element "Robot" {
+                        shape robot
+                      }
+                    }
                   }
                 }
             """.trimIndent(), workspace.toDslString(IndentingWriter()).toString())

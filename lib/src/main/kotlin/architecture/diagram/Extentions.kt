@@ -154,6 +154,9 @@ fun ViewSet.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     // TODO Add other views here
 //    this.dynamicViews.forEach { it.toDslString(indentingWriter) }
 //    this.deploymentViews.forEach { it.toDslString(indentingWriter) }
+
+
+    createDefaultStyles(indentingWriter)
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
@@ -287,3 +290,40 @@ fun SystemLandscapeView.toDslString(indentingWriter: IndentingWriter): Indenting
     return indentingWriter
 }
 
+fun createDefaultStyles(indentingWriter: IndentingWriter): IndentingWriter {
+    indentingWriter.writeLine("styles {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("element \"Person\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape person")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("element \"Database\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape cylinder")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("element \"MobileApp\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape mobileDevicePortrait")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("element \"Browser\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape webBrowser")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("element \"Pipe\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape pipe")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("element \"Robot\" {")
+    indentingWriter.indent()
+    indentingWriter.writeLine("shape robot")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    indentingWriter.outdent()
+    indentingWriter.writeLine("}")
+    return indentingWriter
+}
