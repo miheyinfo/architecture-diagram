@@ -190,9 +190,14 @@ fun ComponentView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
 }
 
 fun ContainerView.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
-    indentingWriter.writeLine("container \"${this.softwareSystem.name}\" {")
+    indentingWriter.writeLine("container ${this.softwareSystem.name.toCamelCase()} {")
     indentingWriter.indent()
-    indentingWriter.writeLine("description \"${this.description}\"")
+    if (!this.title.isNullOrEmpty()) {
+        indentingWriter.writeLine("technology \"${this.title}\"")
+    }
+    if (!this.description.isNullOrEmpty()) {
+        indentingWriter.writeLine("description \"${this.description}\"")
+    }
 //    this.elements.forEach { it.toDslString(indentingWriter) }
 //    this.relationships.forEach { it.toDslString(indentingWriter) }
 
@@ -201,8 +206,6 @@ fun ContainerView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
     indentingWriter.writeLine("include *")
     this.automaticLayout?.toDslString(indentingWriter)
     this.animations.forEach { _ -> toDslString(indentingWriter) }
-    indentingWriter.writeLine("title \"${this.title}\"")
-    indentingWriter.writeLine("description \"${this.description}\"")
     if (this.properties.isNotEmpty()) {
         indentingWriter.writeLine("properties {")
         indentingWriter.indent()
