@@ -4,6 +4,7 @@
 package architecture.diagram
 
 import com.structurizr.Workspace
+import com.structurizr.view.*
 import com.structurizr.export.IndentingWriter
 import com.structurizr.model.InteractionStyle
 import com.structurizr.util.WorkspaceUtils
@@ -293,7 +294,17 @@ class LibraryTest {
         val container = softwareSystem.addContainer("Container", "Description", "Technology")
         container.addComponent("Component", "Description", "Technology")
         val person = workspace.model.addPerson("User")
-        person.uses(softwareSystem, "uses")
+        val styles = workspace.views.configuration.styles
+        styles.addElementStyle("person")
+            .background("#ffbf00")
+            .shape(Shape.Person)
+        person.uses(softwareSystem, "uses", "HTML", InteractionStyle.Synchronous, arrayOf("read"))
+        styles.addElementStyle("database")
+            .background("#facc2E")
+            .shape(Shape.Cylinder)
+        styles.addRelationshipStyle("read")
+            .color("#000000")
+            .dashed(false)
         val viewSet = workspace.views
         val contextView = viewSet.createSystemContextView(
             softwareSystem, "context", "Cluster Diagram"
@@ -323,8 +334,8 @@ class LibraryTest {
                         }
                       }
                     }
-                    user -> softwareSystem "uses" {
-                      tags "Relationship"
+                    user -> softwareSystem "uses" "HTML" {
+                      tags "Relationship", "Synchronous", "read"
                     }
                   }
                   views {
@@ -333,23 +344,16 @@ class LibraryTest {
                       include *
                     }
                     styles {
-                      element "Person" {
-                        shape person
+                      element "person" {
+                        shape Person
+                        background "#ffbf00"
                       }
-                      element "Database" {
-                        shape cylinder
+                      element "database" {
+                        shape Cylinder
+                        background "#facc2e"
                       }
-                      element "MobileApp" {
-                        shape mobileDevicePortrait
-                      }
-                      element "Browser" {
-                        shape webBrowser
-                      }
-                      element "Pipe" {
-                        shape pipe
-                      }
-                      element "Robot" {
-                        shape robot
+                      relationship "read" {
+                        color "#000000"
                       }
                     }
                   }

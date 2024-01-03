@@ -168,7 +168,7 @@ fun ViewSet.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
 //    this.deploymentViews.forEach { it.toDslString(indentingWriter) }
 
 
-    createDefaultStyles(indentingWriter)
+    this.configuration.styles.toDslString(indentingWriter)
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
@@ -305,39 +305,67 @@ fun SystemLandscapeView.toDslString(indentingWriter: IndentingWriter): Indenting
     return indentingWriter
 }
 
-fun createDefaultStyles(indentingWriter: IndentingWriter): IndentingWriter {
+
+fun Styles.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     indentingWriter.writeLine("styles {")
     indentingWriter.indent()
-    indentingWriter.writeLine("element \"Person\" {")
-    indentingWriter.indent()
-    indentingWriter.writeLine("shape person")
+    this.elements.forEach { it.toDslString(indentingWriter) }
+    this.relationships.forEach { it.toDslString(indentingWriter) }
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
-    indentingWriter.writeLine("element \"Database\" {")
+    return indentingWriter
+}
+
+fun RelationshipStyle.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
+    indentingWriter.writeLine("relationship \"${this.tag}\" {")
     indentingWriter.indent()
-    indentingWriter.writeLine("shape cylinder")
+    this.thickness?.let { indentingWriter.writeLine("thickness $it") }
+    this.color?.let { indentingWriter.writeLine("color \"$it\"") }
+    this.style?.let { indentingWriter.writeLine("style ${it.name.lowercase()}") }
+    this.routing?.let { indentingWriter.writeLine("routing ${it.name}") }
+    this.fontSize?.let { indentingWriter.writeLine("fontSize $it") }
+    this.width?.let { indentingWriter.writeLine("width $it") }
+    this.position?.let { indentingWriter.writeLine("position $it") }
+    this.opacity?.let { indentingWriter.writeLine("opacity $it") }
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
-    indentingWriter.writeLine("element \"MobileApp\" {")
+    return indentingWriter
+}
+
+fun ElementStyle.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
+    indentingWriter.writeLine("element \"${this.tag}\" {")
     indentingWriter.indent()
-    indentingWriter.writeLine("shape mobileDevicePortrait")
-    indentingWriter.outdent()
-    indentingWriter.writeLine("}")
-    indentingWriter.writeLine("element \"Browser\" {")
-    indentingWriter.indent()
-    indentingWriter.writeLine("shape webBrowser")
-    indentingWriter.outdent()
-    indentingWriter.writeLine("}")
-    indentingWriter.writeLine("element \"Pipe\" {")
-    indentingWriter.indent()
-    indentingWriter.writeLine("shape pipe")
-    indentingWriter.outdent()
-    indentingWriter.writeLine("}")
-    indentingWriter.writeLine("element \"Robot\" {")
-    indentingWriter.indent()
-    indentingWriter.writeLine("shape robot")
-    indentingWriter.outdent()
-    indentingWriter.writeLine("}")
+    indentingWriter.writeLine("shape ${this.shape}")
+    this.icon?.let { indentingWriter.writeLine("icon \"$it\"") }
+    this.width?.let { indentingWriter.writeLine("width $it") }
+    this.height?.let { indentingWriter.writeLine("height $it") }
+    this.background?.let { indentingWriter.writeLine("background \"$it\"") }
+    this.color?.let { indentingWriter.writeLine("color \"$it\"") }
+    this.stroke?.let { indentingWriter.writeLine("stroke \"$it\"") }
+    this.strokeWidth?.let { indentingWriter.writeLine("strokeWidth $it") }
+    this.fontSize?.let { indentingWriter.writeLine("fontSize $it") }
+    this.border?.let { indentingWriter.writeLine("border ${it.name.lowercase()}") }
+    this.opacity?.let { indentingWriter.writeLine("opacity $it") }
+    this.metadata?.let { indentingWriter.writeLine("metadata $it") }
+    this.description?.let { indentingWriter.writeLine("description $it") }
+    if (this.properties.isNotEmpty()) {
+        indentingWriter.writeLine("properties {")
+        indentingWriter.indent()
+        this.properties.toSortedMap().forEach { (key, value) ->
+            indentingWriter.writeLine("$key \"$value\"")
+        }
+        indentingWriter.outdent()
+        indentingWriter.writeLine("}")
+    }
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
