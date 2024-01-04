@@ -7,7 +7,8 @@ import com.structurizr.view.*
 
 
 fun String.toCamelCase(): String {
-    return this.split(" ")
+    val regex = "[\\s.-]+".toRegex()
+    return this.split(regex)
         .mapIndexed { index, word ->
             if (index == 0) word.lowercase() else word.replaceFirstChar { it.uppercase() }
         }
