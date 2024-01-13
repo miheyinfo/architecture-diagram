@@ -204,7 +204,11 @@ fun ContainerView.toDslString(indentingWriter: IndentingWriter): IndentingWriter
 
     // TODO Add other attributes here
 
-    indentingWriter.writeLine("include *")
+    if (this.properties["element.type"] != null) {
+        indentingWriter.writeLine("include element.type==${this.properties["element.type"]}")
+    } else {
+        indentingWriter.writeLine("include *")
+    }
     this.automaticLayout?.toDslString(indentingWriter)
     this.animations.forEach { _ -> toDslString(indentingWriter) }
     if (this.properties.isNotEmpty()) {
