@@ -139,7 +139,8 @@ fun Model.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
     return indentingWriter
 }
 
-fun Workspace.toDslString(indentingWriter: IndentingWriter): IndentingWriter {
+fun Workspace.toDslString(): IndentingWriter {
+    val indentingWriter = IndentingWriter()
     indentingWriter.writeLine("workspace \"${this.name}\" \"${this.description}\" {")
     indentingWriter.indent()
     this.model.toDslString(indentingWriter)

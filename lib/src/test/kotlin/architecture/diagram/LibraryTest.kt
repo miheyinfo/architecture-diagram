@@ -358,7 +358,7 @@ class LibraryTest {
                     }
                   }
                 }
-            """.trimIndent(), workspace.toDslString(IndentingWriter()).toString())
+            """.trimIndent(), workspace.toDslString().toString())
     }
 
 
