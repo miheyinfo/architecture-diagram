@@ -306,6 +306,7 @@ fun SystemLandscapeView.toDslString(indentingWriter: IndentingWriter): Indenting
     indentingWriter.writeLine("systemLandscape ${this.softwareSystem.name} {")
     indentingWriter.indent()
     indentingWriter.writeLine("description \"${this.description}\"")
+    indentingWriter.writeLine("include *")
     indentingWriter.outdent()
     indentingWriter.writeLine("}")
     return indentingWriter
